@@ -64,4 +64,87 @@ br.com.bookstore
 
 ## 🗄️ Banco de dados
 
-O sistema utiliza MySQL 8
+O sistema utiliza MySQL 8 como banco de dados relacional.
+
+Entre as principais entidades estão:
+
+- Livros
+- Categorias
+- Autores
+- Editoras
+- Clientes
+- Vendas
+- Itens de venda
+- Fornecedores
+- Movimentações de estoque
+- Usuários
+
+O relacionamento entre as entidades permite organizar as informações e manter a integridade dos dados.
+
+## 📖 Documentação da API
+
+A documentação interativa é disponibilizada pelo Swagger UI.
+
+Após iniciar a aplicação, acesse:
+
+http://localhost:8080/swagger-ui/index.html
+
+## ▶️ Como executar o projeto
+
+### Pré-requisitos
+
+- Java 25 ou compatível com a configuração do projeto.
+- MySQL 8.
+- Maven.
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/thayanne204/bookstore-manager.git
+```
+
+### 2. Acesse a pasta do projeto
+
+```bash
+cd bookstore-manager
+```
+
+### 3. Configure o banco de dados
+
+Crie o banco de dados no MySQL:
+
+```sql
+CREATE DATABASE bookstore_manager;
+```
+
+Configure as credenciais de acesso ao banco no arquivo `application.properties`.
+
+### 4. Execute a aplicação
+
+No Windows:
+
+```cmd
+mvnw.cmd spring-boot:run
+```
+
+No Linux ou macOS:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Após iniciar, a API estará disponível em:
+
+http://localhost:8080
+
+## 👩‍💻 Desenvolvimento
+
+Projeto desenvolvido como atividade acadêmica da área de Engenharia de Software, com foco em desenvolvimento backend utilizando Java e Spring Boot.
+
+## 🔗 Repositório
+
+[GitHub — BookStore Manager](https://github.com/thayanne204/bookstore-manager)
+
+---
+
+**BookStore Manager — Organização, tecnologia e gestão para livrarias.**
