@@ -1,6 +1,7 @@
 
 package br.com.bookstore.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,18 @@ import br.com.bookstore.exception.ResourceNotFoundException;
 import br.com.bookstore.repository.CategoriaRepository;
 import br.com.bookstore.repository.EditoraRepository;
 import br.com.bookstore.service.LivroService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(name = "Livros", description = "Gerenciamento de livros e estoque")
+@ApiResponses({
+        @ApiResponse(responseCode = "400", description = "Dados enviados inválidos"),
+        @ApiResponse(responseCode = "404", description = "Registro não encontrado"),
+        @ApiResponse(responseCode = "409", description = "Conflito com regra de negócio")
+})
 @RestController
 @RequestMapping("/api/livros")
 public class LivroController {
@@ -84,9 +95,11 @@ public class LivroController {
         livro.setEstoqueMinimo(dto.getEstoqueMinimo());
         livro.setCategoria(categoria);
         livro.setEditora(editora);
-        livro.setAtivo(dto.getAtivo());
+        livro.setAtivo(dto.getAtivo() == null ? Boolean.TRUE : dto.getAtivo());
     }
 
+    @Operation(summary = "Cadastrar novo registro")
+    @ApiResponse(responseCode = "201", description = "Criado com sucesso")
     @PostMapping
     public ResponseEntity<LivroResponseDTO> cadastrar(
             @Valid @RequestBody LivroRequestDTO dto) {
@@ -98,6 +111,8 @@ public class LivroController {
                 .body(converterParaDTO(salvo));
     }
 
+    @Operation(summary = "Listar todos os registros")
+    @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
     @GetMapping
     public ResponseEntity<List<LivroResponseDTO>> listarTodos() {
 
@@ -109,6 +124,8 @@ public class LivroController {
         return ResponseEntity.ok(livros);
     }
 
+    @Operation(summary = "Buscar registro por ID")
+    @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
     @GetMapping("/{id}")
     public ResponseEntity<LivroResponseDTO> buscarPorId(
             @PathVariable Long id) {
@@ -118,6 +135,8 @@ public class LivroController {
         return ResponseEntity.ok(converterParaDTO(livro));
     }
 
+    @Operation(summary = "Buscar livros pelo título (parcial, sem diferenciar maiúsculas)")
+    @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
     @GetMapping("/buscar")
     public ResponseEntity<List<LivroResponseDTO>> buscarPorTitulo(
             @RequestParam String titulo) {
@@ -130,6 +149,25 @@ public class LivroController {
         return ResponseEntity.ok(livros);
     }
 
+    @Operation(summary = "Filtrar livros por categoria e/ou faixa de preço")
+    @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
+    @GetMapping("/filtrar")
+    public ResponseEntity<List<LivroResponseDTO>> filtrar(
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) BigDecimal precoMin,
+            @RequestParam(required = false) BigDecimal precoMax) {
+
+        List<LivroResponseDTO> livros = livroService
+                .filtrar(categoriaId, precoMin, precoMax)
+                .stream()
+                .map(this::converterParaDTO)
+                .toList();
+
+        return ResponseEntity.ok(livros);
+    }
+
+    @Operation(summary = "Listar apenas livros ativos")
+    @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
     @GetMapping("/ativos")
     public ResponseEntity<List<LivroResponseDTO>> listarAtivos() {
 
@@ -141,6 +179,8 @@ public class LivroController {
         return ResponseEntity.ok(livros);
     }
 
+    @Operation(summary = "Listar livros com estoque menor ou igual ao limite informado")
+    @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
     @GetMapping("/estoque-baixo")
     public ResponseEntity<List<LivroResponseDTO>> listarEstoqueBaixo(
             @RequestParam(defaultValue = "5") int limite) {
@@ -153,6 +193,8 @@ public class LivroController {
         return ResponseEntity.ok(livros);
     }
 
+    @Operation(summary = "Atualizar registro existente")
+    @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
     @PutMapping("/{id}")
     public ResponseEntity<LivroResponseDTO> atualizar(
             @PathVariable Long id,
@@ -167,6 +209,8 @@ public class LivroController {
         return ResponseEntity.ok(converterParaDTO(atualizado));
     }
 
+    @Operation(summary = "Excluir registro (respeitando as regras de negócio)")
+    @ApiResponse(responseCode = "204", description = "Excluído com sucesso")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
 

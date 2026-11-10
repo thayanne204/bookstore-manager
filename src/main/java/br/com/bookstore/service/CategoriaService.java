@@ -9,14 +9,19 @@ import br.com.bookstore.entity.Categoria;
 import br.com.bookstore.exception.BusinessException;
 import br.com.bookstore.exception.ResourceNotFoundException;
 import br.com.bookstore.repository.CategoriaRepository;
+import br.com.bookstore.repository.LivroRepository;
 
 @Service
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
+    private final LivroRepository livroRepository;
 
-    public CategoriaService(CategoriaRepository categoriaRepository) {
+    public CategoriaService(
+            CategoriaRepository categoriaRepository,
+            LivroRepository livroRepository) {
         this.categoriaRepository = categoriaRepository;
+        this.livroRepository = livroRepository;
     }
 
     public List<Categoria> listarTodas() {
@@ -56,6 +61,12 @@ public class CategoriaService {
 
     public void excluir(Long id) {
         Categoria categoria = buscarPorId(id);
+
+        if (livroRepository.existsByCategoriaId(id)) {
+            throw new BusinessException(
+                    "Não é possível excluir a categoria porque existem livros vinculados a ela.");
+        }
+
         categoriaRepository.delete(categoria);
     }
 }

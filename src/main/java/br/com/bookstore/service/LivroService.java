@@ -5,10 +5,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.bookstore.entity.Livro;
 import br.com.bookstore.exception.BusinessException;
 import br.com.bookstore.exception.ResourceNotFoundException;
+import br.com.bookstore.repository.ItemVendaRepository;
 import br.com.bookstore.repository.LivroRepository;
 
 @Service
@@ -16,8 +18,13 @@ public class LivroService {
 
     private final LivroRepository livroRepository;
 
-    public LivroService(LivroRepository livroRepository) {
+    private final ItemVendaRepository itemVendaRepository;
+
+    public LivroService(
+            LivroRepository livroRepository,
+            ItemVendaRepository itemVendaRepository) {
         this.livroRepository = livroRepository;
+        this.itemVendaRepository = itemVendaRepository;
     }
 
     public List<Livro> listarTodos() {
@@ -46,6 +53,21 @@ public class LivroService {
         return livroRepository.findByQuantidadeEstoqueLessThanEqual(limite);
     }
 
+    @Transactional(readOnly = true)
+    public List<Livro> filtrar(Long categoriaId, BigDecimal precoMin, BigDecimal precoMax) {
+        if (precoMin != null && precoMax != null && precoMin.compareTo(precoMax) > 0) {
+            throw new BusinessException("O preço mínimo não pode ser maior que o preço máximo.");
+        }
+
+        return livroRepository.findAll().stream()
+                .filter(l -> categoriaId == null
+                        || l.getCategoria().getId().equals(categoriaId))
+                .filter(l -> precoMin == null || l.getPreco().compareTo(precoMin) >= 0)
+                .filter(l -> precoMax == null || l.getPreco().compareTo(precoMax) <= 0)
+                .toList();
+    }
+
+    @Transactional
     public Livro cadastrar(Livro livro) {
         validarLivro(livro);
 
@@ -57,6 +79,7 @@ public class LivroService {
         return livroRepository.save(livro);
     }
 
+    @Transactional
     public Livro atualizar(Long id, Livro dados) {
         Livro livro = buscarPorId(id);
 
@@ -83,8 +106,15 @@ public class LivroService {
         return livroRepository.save(livro);
     }
 
+    @Transactional
     public void excluir(Long id) {
         Livro livro = buscarPorId(id);
+
+        if (itemVendaRepository.existsByLivroId(id)) {
+            throw new BusinessException(
+                    "Não é possível excluir o livro porque ele já foi vendido. Inative o cadastro.");
+        }
+
         livroRepository.delete(livro);
     }
 

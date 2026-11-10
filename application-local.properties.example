@@ -1,0 +1,4 @@
+# Copie este arquivo para "application-local.properties" (mesma pasta, ao lado do pom.xml)
+# e coloque a senha do MySQL deste computador. O arquivo real e ignorado pelo Git.
+spring.datasource.username=root
+spring.datasource.password=SUA_SENHA_DO_MYSQL

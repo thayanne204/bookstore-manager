@@ -13,6 +13,8 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
 
     List<Venda> findByClienteId(Long clienteId);
 
+    boolean existsByClienteId(Long clienteId);
+
     List<Venda> findByStatus(String status);
 
     List<Venda> findByDataVendaBetween(

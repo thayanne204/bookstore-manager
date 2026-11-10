@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -55,5 +57,23 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .body(Map.of("erro",
                         "Não foi possível realizar a operação porque existem dados relacionados ou conflitantes."));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> tratarJsonInvalido(
+            HttpMessageNotReadableException ex) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of("erro", "Corpo da requisição inválido ou mal formatado."));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, String>> tratarTipoInvalido(
+            MethodArgumentTypeMismatchException ex) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of("erro", "Valor inválido para o parâmetro '" + ex.getName() + "'."));
     }
 }

@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -30,7 +31,7 @@ public class Venda {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    @Column(name = "data_venda", insertable = false, updatable = false)
+    @Column(name = "data_venda", nullable = false, updatable = false)
     private LocalDateTime dataVenda;
 
     @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
@@ -49,6 +50,13 @@ public class Venda {
     private List<ItemVenda> itens = new ArrayList<>();
 
     public Venda() {
+    }
+
+    @PrePersist
+    void definirDataVenda() {
+        if (dataVenda == null) {
+            dataVenda = LocalDateTime.now();
+        }
     }
 
     public Long getId() {

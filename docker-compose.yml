@@ -1,0 +1,17 @@
+# Sobe apenas o MySQL já com as tabelas criadas (docs/schema.sql).
+# Uso: docker compose up -d
+services:
+  mysql:
+    image: mysql:8
+    container_name: bookstore-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-bookstore123}
+      MYSQL_DATABASE: bookstore_manager
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docs/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

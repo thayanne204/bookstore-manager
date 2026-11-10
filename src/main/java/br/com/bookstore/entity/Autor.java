@@ -30,7 +30,7 @@ public class Autor {
     @Column(columnDefinition = "TEXT")
     private String biografia;
 
-    @Column(name = "data_criacao")
+    @Column(name = "data_criacao", insertable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
     @ManyToMany(mappedBy = "autores")

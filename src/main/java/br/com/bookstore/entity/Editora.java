@@ -32,7 +32,7 @@ public class Editora {
     @Column(length = 255)
     private String endereco;
 
-    @Column(name = "data_criacao")
+    @Column(name = "data_criacao", insertable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
     public Editora() {

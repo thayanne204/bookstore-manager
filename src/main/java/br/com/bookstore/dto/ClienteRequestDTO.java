@@ -28,6 +28,7 @@ public class ClienteRequestDTO {
 
     private String cidade;
 
+    @Size(max = 2, message = "Informe a sigla do estado com 2 letras.")
     private String estado;
 
     @NotNull(message = "Informe se o cliente está ativo.")

@@ -13,4 +13,6 @@ public interface ItemVendaRepository extends JpaRepository<ItemVenda, Long> {
     List<ItemVenda> findByVendaId(Long vendaId);
 
     List<ItemVenda> findByLivroId(Long livroId);
+
+    boolean existsByLivroId(Long livroId);
 }

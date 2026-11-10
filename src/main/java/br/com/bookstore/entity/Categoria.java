@@ -26,7 +26,7 @@ public class Categoria {
     @Column
     private Boolean ativo = true;
 
-    @Column(name = "data_criacao")
+    @Column(name = "data_criacao", insertable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
     public Categoria() {

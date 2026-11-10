@@ -2,6 +2,7 @@
 package br.com.bookstore.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,9 @@ import br.com.bookstore.repository.VendaRepository;
 
 @Service
 public class VendaService {
+
+    private static final String STATUS_CONCLUIDA = "CONCLUIDA";
+    private static final String STATUS_CANCELADA = "CANCELADA";
 
     private final VendaRepository vendaRepository;
     private final ClienteRepository clienteRepository;
@@ -72,7 +76,7 @@ public class VendaService {
         venda.setCliente(cliente);
         venda.setFormaPagamento(dados.getFormaPagamento());
         venda.setDesconto(desconto);
-        venda.setStatus("CONCLUIDA");
+        venda.setStatus(STATUS_CONCLUIDA);
 
         List<ItemVenda> itens = new ArrayList<>();
         BigDecimal subtotalGeral = BigDecimal.ZERO;
@@ -144,6 +148,69 @@ public class VendaService {
         }
 
         return vendaSalva;
+    }
+
+    @Transactional
+    public Venda atualizar(Long id, String formaPagamento) {
+        Venda venda = buscarPorId(id);
+
+        if (!STATUS_CONCLUIDA.equals(venda.getStatus())) {
+            throw new BusinessException(
+                    "Só é possível alterar vendas com status CONCLUIDA.");
+        }
+
+        venda.setFormaPagamento(formaPagamento);
+
+        return vendaRepository.save(venda);
+    }
+
+    @Transactional
+    public Venda cancelar(Long id) {
+        Venda venda = buscarPorId(id);
+
+        if (STATUS_CANCELADA.equals(venda.getStatus())) {
+            throw new BusinessException("A venda já está cancelada.");
+        }
+
+        for (ItemVenda item : venda.getItens()) {
+            Livro livro = item.getLivro();
+
+            livro.setQuantidadeEstoque(
+                    livro.getQuantidadeEstoque() + item.getQuantidade());
+            livroRepository.save(livro);
+
+            MovimentacaoEstoque movimentacao = new MovimentacaoEstoque();
+            movimentacao.setLivro(livro);
+            movimentacao.setTipo(TipoMovimentacao.ENTRADA);
+            movimentacao.setQuantidade(item.getQuantidade());
+            movimentacao.setMotivo("Cancelamento da venda #" + venda.getId());
+
+            movimentacaoRepository.save(movimentacao);
+        }
+
+        venda.setStatus(STATUS_CANCELADA);
+
+        return vendaRepository.save(venda);
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        Venda venda = buscarPorId(id);
+
+        if (!STATUS_CANCELADA.equals(venda.getStatus())) {
+            throw new BusinessException(
+                    "Só é possível excluir vendas canceladas. Cancele a venda primeiro.");
+        }
+
+        vendaRepository.delete(venda);
+    }
+
+    public List<Venda> buscarPorPeriodo(LocalDateTime inicio, LocalDateTime fim) {
+        if (inicio.isAfter(fim)) {
+            throw new BusinessException("A data inicial não pode ser posterior à data final.");
+        }
+
+        return vendaRepository.findByDataVendaBetween(inicio, fim);
     }
 
     public List<Venda> listarTodas() {

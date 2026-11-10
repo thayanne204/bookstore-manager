@@ -14,8 +14,8 @@ public class OpenApiConfig {
     public OpenAPI bookstoreOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("BookStore Manager API")
-                        .description("API REST para gerenciamento de livraria.")
+                        .title("Tecnoteca API")
+                        .description("API REST para gerenciamento da livraria Tecnoteca.")
                         .version("1.0.0"));
     }
 }
