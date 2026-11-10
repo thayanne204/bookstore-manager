@@ -210,7 +210,7 @@ A documentação interativa é disponibilizada pelo Swagger UI.
 
 Após iniciar a aplicação, acesse:
 
-http://localhost:8080/swagger-ui/index.html
+http://localhost:8081/swagger-ui/index.html
 
 ## ▶️ Como executar o projeto
 
@@ -275,7 +275,7 @@ No Linux ou macOS:
 
 Após iniciar, a API estará disponível em:
 
-http://localhost:8080
+http://localhost:8081/
 
 ## 👩‍💻 Desenvolvimento
 
