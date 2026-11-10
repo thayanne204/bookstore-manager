@@ -200,7 +200,7 @@ Sem esse parâmetro, a aplicação usa o MySQL normalmente.
 
 A aplicação inclui uma interface web simples (HTML, CSS e JavaScript puro) que consome a API. Ela fica em `src/main/resources/static` e é servida pelo próprio Spring Boot. Com a aplicação rodando, acesse:
 
-http://localhost:8080/
+http://localhost:8081/
 
 Pela interface é possível cadastrar, listar e excluir livros, clientes, categorias e editoras, buscar livros por título e faixa de preço, registrar vendas (com baixa de estoque), cancelar e excluir vendas. As mensagens de erro da API (400, 404 e 409) aparecem na tela.
 
